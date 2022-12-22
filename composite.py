@@ -26,7 +26,15 @@ USR_PREF_PROPS = {
     'required': set(),
     'fields': ('circuitRef','name', 'location', 'country', 'lat', 'lng', 'alt', 'url')
 }
-PROPS = (USR_ADDR_PROPS, USR_PREF_PROPS)
+
+USR_STUDENT = {
+    'microservice': 'students',
+    # 'api': 'http://ec2-3-145-83-228.us-east-2.compute.amazonaws.com:5000/api/profile',
+    'api': 'http://54.89.81.97:5014/api/students/',
+    'required': set(),
+    'fields': ('auto_id', 'last_name', 'first_name', 'middle_name', 'email', 'uni', 'address_line1', 'address_line2','city','state')
+}
+PROPS = (USR_ADDR_PROPS, USR_PREF_PROPS,USR_STUDENT)
 
 
 def project_req_data(req_data: dict, props: tuple, required_props: set) -> dict:
@@ -42,7 +50,7 @@ def project_req_data(req_data: dict, props: tuple, required_props: set) -> dict:
 def get_information(id):
     futures = []
     i = 0
-    for props in (USR_ADDR_PROPS, USR_PREF_PROPS):
+    for props in (USR_ADDR_PROPS, USR_PREF_PROPS,USR_STUDENT):
         if id[i] == "None":
             i += 1
             futures.append("nothing")
@@ -65,9 +73,9 @@ def get_information(id):
         elif not res.ok:
             flag = 0
             code = res.status_code
-            temp += f"{microservice} query information failed."
+            temp += f"{microservice} query information failed." + "\n"
         else:
-            temp += f"{microservice} query information successfully." + str(res.json())
+            temp += f"{microservice} query information successfully." + "\n" + str(res.json()) + "\n"
     if flag == 1:
         return 200, temp
     else:
@@ -78,7 +86,7 @@ def create_microservices(req_data: dict,
                                 headers: Dict) -> (int, str):
     futures = []
     i = 0
-    for props in (USR_ADDR_PROPS, USR_PREF_PROPS):
+    for props in (USR_ADDR_PROPS, USR_PREF_PROPS,USR_STUDENT):
         if id[i] == "None":
             i += 1
             futures.append("nothing")
@@ -109,9 +117,9 @@ def create_microservices(req_data: dict,
         elif not res.ok:
             flag = 0
             code = res.status_code
-            temp += f"{microservice} insert failed."
+            temp += f"{microservice} insert failed." + "\n"
         else:
-            temp += f"{microservice} insert successfully."
+            temp += f"{microservice} insert successfully." + "\n"
     if flag == 1:
         return 200, "User info insert successfully!"
     else:
@@ -122,7 +130,7 @@ def update_information(req_data: dict,
                                 headers: Dict) -> (int, str):
     futures = []
     i = 0
-    for props in (USR_ADDR_PROPS, USR_PREF_PROPS):
+    for props in (USR_ADDR_PROPS, USR_PREF_PROPS,USR_STUDENT):
         if id[i] == "None":
             i += 1
             futures.append("nothing")
@@ -153,9 +161,9 @@ def update_information(req_data: dict,
         elif not res.ok:
             flag = 0
             code = res.status_code
-            temp += f"{microservice} update failed."
+            temp += f"{microservice} update failed." + "\n"
         else:
-            temp += f"{microservice} update successfully."
+            temp += f"{microservice} update successfully." + "\n"
     if flag == 1:
         return 200, temp
     else:
@@ -164,7 +172,7 @@ def update_information(req_data: dict,
 def delete_information(id):
     futures = []
     i = 0
-    for props in (USR_ADDR_PROPS, USR_PREF_PROPS):
+    for props in (USR_ADDR_PROPS, USR_PREF_PROPS,USR_STUDENT):
         if id[i] == "None":
             i += 1
             futures.append("nothing")
@@ -186,18 +194,18 @@ def delete_information(id):
         elif not res.ok:
             flag = 0
             code = res.status_code
-            temp += f"{microservice} delete information failed."
+            temp += f"{microservice} delete information failed." + "\n"
         else:
-            temp += f"{microservice} delete information successfully." + str(res.json())
+            temp += f"{microservice} delete information successfully." + "\n" + str(res.json()) + "\n"
     if flag == 1:
         return 200, temp
     else:
         return code, temp
 
-@app.route('/api/composition/<id_1>/<id_2>', methods=['GET','PUT','POST','DELETE'])
-def composition(id_1,id_2):
+@app.route('/api/composition/<id_1>/<id_2>/<id_3>', methods=['GET','PUT','POST','DELETE'])
+def composition(id_1,id_2,id_3):
     request_inputs = rest_utils.RESTContext(request)
-    id = [id_1, id_2]
+    id = [id_1, id_2,id_3]
     print(id)
     if request_inputs.method == "PUT":
         req_data = request.get_json()
@@ -216,4 +224,4 @@ def composition(id_1,id_2):
         status_code, message = delete_information(id)
         return Response(f"{status_code} - {message}", status=status_code, mimetype="application/json")
 if __name__ == "__main__":
-    app.run(host="192.168.0.82", port=5013)
+    app.run(host="192.168.0.82", port=5015)
